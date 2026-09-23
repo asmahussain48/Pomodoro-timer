@@ -54,9 +54,9 @@
       <h1 class="title">Pomodoro Timer</h1>
 
       <div class="mode-tabs" role="tablist" aria-label="Timer mode">
-        <button class="mode-tab active" data-mode="focus" data-duration="1500" role="tab" aria-selected="true">Focus</button>
-        <button class="mode-tab" data-mode="short" data-duration="300" role="tab" aria-selected="false">Short Break</button>
-        <button class="mode-tab" data-mode="long" data-duration="900" role="tab" aria-selected="false">Long Break</button>
+        <button class="mode-tab active" data-mode="focus" role="tab" aria-selected="true">Focus</button>
+        <button class="mode-tab" data-mode="short" role="tab" aria-selected="false">Short Break</button>
+        <button class="mode-tab" data-mode="long" role="tab" aria-selected="false">Long Break</button>
       </div>
 
       <div class="ring-wrapper">
@@ -78,12 +78,60 @@
         <button id="reset" class="btn btn-reset"><span>↺</span> Reset</button>
       </div>
 
-      <button id="fullscreen" class="fullscreen-btn" title="Toggle fullscreen" aria-label="Toggle fullscreen">
-        <svg xmlns="http://www.w3.org/2000/svg" class="fullscreen-icon" viewBox="0 0 24 24" width="20" height="20">
+      <button id="fullscreen" class="icon-btn fullscreen-btn" title="Toggle fullscreen" aria-label="Toggle fullscreen">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
           <path fill="currentColor" d="M7 14H5v5h5v-2H7v-3zm0-4h2V7h3V5H7v5zm10 0h-2V7h-3V5h5v5zm-2 6h3v-3h2v5h-5v-2z"/>
         </svg>
       </button>
+
+      <button id="settings-btn" class="icon-btn settings-btn" title="Customize timer durations" aria-label="Customize timer durations" aria-haspopup="dialog">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+          <path fill="currentColor" d="M19.14,12.94a7.14,7.14,0,0,0,.05-1,7.14,7.14,0,0,0-.05-1l2.11-1.65a.5.5,0,0,0,.12-.64l-2-3.46a.5.5,0,0,0-.6-.22l-2.49,1a7.3,7.3,0,0,0-1.71-1l-.38-2.65A.49.49,0,0,0,14,2H10a.49.49,0,0,0-.49.42L9.13,5.07a7.3,7.3,0,0,0-1.71,1l-2.49-1a.5.5,0,0,0-.6.22l-2,3.46a.5.5,0,0,0,.12.64L4.56,11a7.14,7.14,0,0,0,0,2L2.45,14.65a.5.5,0,0,0-.12.64l2,3.46a.5.5,0,0,0,.6.22l2.49-1a7.3,7.3,0,0,0,1.71,1l.38,2.65A.49.49,0,0,0,10,22h4a.49.49,0,0,0,.49-.42l.38-2.65a7.3,7.3,0,0,0,1.71-1l2.49,1a.5.5,0,0,0,.6-.22l2-3.46a.5.5,0,0,0-.12-.64ZM12,15.5A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"/>
+        </svg>
+      </button>
     </main>
+  </div>
+
+  <div class="modal-overlay" id="settings-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="modal-header">
+        <h2 id="settings-title">Customize Timer</h2>
+        <button class="modal-close" id="settings-close" aria-label="Close settings">✕</button>
+      </div>
+      <p class="modal-subtitle">Set your own session lengths, in minutes.</p>
+
+      <div class="duration-field">
+        <label for="focus-duration">🎯 Focus</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-target="focus-duration" data-step="-1" aria-label="Decrease focus minutes">−</button>
+          <input type="number" id="focus-duration" min="1" max="180" inputmode="numeric" value="25" />
+          <button type="button" class="step-btn" data-target="focus-duration" data-step="1" aria-label="Increase focus minutes">+</button>
+        </div>
+      </div>
+
+      <div class="duration-field">
+        <label for="short-duration">☕ Short Break</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-target="short-duration" data-step="-1" aria-label="Decrease short break minutes">−</button>
+          <input type="number" id="short-duration" min="1" max="180" inputmode="numeric" value="5" />
+          <button type="button" class="step-btn" data-target="short-duration" data-step="1" aria-label="Increase short break minutes">+</button>
+        </div>
+      </div>
+
+      <div class="duration-field">
+        <label for="long-duration">🛋️ Long Break</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-target="long-duration" data-step="-1" aria-label="Decrease long break minutes">−</button>
+          <input type="number" id="long-duration" min="1" max="180" inputmode="numeric" value="15" />
+          <button type="button" class="step-btn" data-target="long-duration" data-step="1" aria-label="Increase long break minutes">+</button>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="settings-reset">Reset Defaults</button>
+        <button class="btn btn-save" id="settings-save">Save Changes</button>
+      </div>
+    </div>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>

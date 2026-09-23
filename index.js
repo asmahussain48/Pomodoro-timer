@@ -11,11 +11,55 @@ var toastEl = document.getElementById("toast");
 
 var alarmAudio = new Audio("sounds/bell.mp3");
 
-var MODES = {
-  focus: { seconds: 1500, label: "Focus session", ring: "mode-focus" },
-  short: { seconds: 300, label: "Short break", ring: "mode-short" },
-  long: { seconds: 900, label: "Long break", ring: "mode-long" }
+// ===== Customizable durations (persisted to localStorage) =====
+var DEFAULT_DURATIONS = { focus: 25, short: 5, long: 15 };
+var MODE_META = {
+  focus: { label: "Focus session", ring: "mode-focus" },
+  short: { label: "Short break", ring: "mode-short" },
+  long: { label: "Long break", ring: "mode-long" }
 };
+var DURATIONS_STORAGE_KEY = "pomodoro-durations-v1";
+var MODES = {};
+
+function clampMinutes(value) {
+  var num = Math.round(Number(value));
+  if (isNaN(num)) return 1;
+  return Math.min(180, Math.max(1, num));
+}
+
+function buildModes(durations) {
+  Object.keys(MODE_META).forEach(function (mode) {
+    MODES[mode] = {
+      seconds: durations[mode] * 60,
+      label: MODE_META[mode].label,
+      ring: MODE_META[mode].ring
+    };
+  });
+}
+
+function loadDurations() {
+  try {
+    var raw = localStorage.getItem(DURATIONS_STORAGE_KEY);
+    if (!raw) return Object.assign({}, DEFAULT_DURATIONS);
+    var parsed = JSON.parse(raw);
+    var result = {};
+    Object.keys(DEFAULT_DURATIONS).forEach(function (mode) {
+      result[mode] = parsed[mode] !== undefined ? clampMinutes(parsed[mode]) : DEFAULT_DURATIONS[mode];
+    });
+    return result;
+  } catch (e) {
+    return Object.assign({}, DEFAULT_DURATIONS);
+  }
+}
+
+function saveDurations(durations) {
+  try {
+    localStorage.setItem(DURATIONS_STORAGE_KEY, JSON.stringify(durations));
+  } catch (e) {}
+}
+
+var currentDurations = loadDurations();
+buildModes(currentDurations);
 
 var RING_CIRCUMFERENCE = 2 * Math.PI * 126;
 ringProgress.style.strokeDasharray = RING_CIRCUMFERENCE.toFixed(2);
@@ -145,6 +189,84 @@ resetButton.addEventListener("click", resetTimer);
 renderSessionDots();
 setMode(currentMode, { silent: true });
 
+// ===== Settings modal (customize durations) =====
+var settingsButton = document.getElementById("settings-btn");
+var settingsOverlay = document.getElementById("settings-overlay");
+var settingsCloseButton = document.getElementById("settings-close");
+var settingsSaveButton = document.getElementById("settings-save");
+var settingsResetButton = document.getElementById("settings-reset");
+var durationInputs = {
+  focus: document.getElementById("focus-duration"),
+  short: document.getElementById("short-duration"),
+  long: document.getElementById("long-duration")
+};
+
+function fillDurationInputs(durations) {
+  durationInputs.focus.value = durations.focus;
+  durationInputs.short.value = durations.short;
+  durationInputs.long.value = durations.long;
+}
+
+function openSettings() {
+  fillDurationInputs(currentDurations);
+  settingsOverlay.classList.add("show");
+  settingsOverlay.setAttribute("aria-hidden", "false");
+  durationInputs.focus.focus();
+}
+
+function closeSettings() {
+  settingsOverlay.classList.remove("show");
+  settingsOverlay.setAttribute("aria-hidden", "true");
+  settingsButton.focus();
+}
+
+function applyDurations(durations) {
+  currentDurations = durations;
+  buildModes(currentDurations);
+  saveDurations(currentDurations);
+  setMode(currentMode);
+}
+
+settingsButton.addEventListener("click", openSettings);
+settingsCloseButton.addEventListener("click", closeSettings);
+
+settingsOverlay.addEventListener("click", function (event) {
+  if (event.target === settingsOverlay) closeSettings();
+});
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape" && settingsOverlay.classList.contains("show")) {
+    closeSettings();
+  }
+});
+
+document.querySelectorAll(".step-btn").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    var target = document.getElementById(btn.getAttribute("data-target"));
+    var step = parseInt(btn.getAttribute("data-step"), 10);
+    target.value = clampMinutes((parseInt(target.value, 10) || 0) + step);
+  });
+});
+
+settingsSaveButton.addEventListener("click", function () {
+  var newDurations = {
+    focus: clampMinutes(durationInputs.focus.value),
+    short: clampMinutes(durationInputs.short.value),
+    long: clampMinutes(durationInputs.long.value)
+  };
+  applyDurations(newDurations);
+  showToast("Timer settings saved");
+  closeSettings();
+});
+
+settingsResetButton.addEventListener("click", function () {
+  var defaults = Object.assign({}, DEFAULT_DURATIONS);
+  fillDurationInputs(defaults);
+  applyDurations(defaults);
+  showToast("Reset to default durations");
+  closeSettings();
+});
+
 // ===== Ambient sound system =====
 var soundFiles = {
   original: "sounds/original.mp3",
@@ -169,7 +291,6 @@ document.addEventListener("click", function () {
   if (!soundsUnlocked) {
     for (var key in audioElements) {
       audioElements[key].play().catch(function () {});
-      audioElements[key].pause();
     }
     soundsUnlocked = true;
   }
@@ -209,12 +330,12 @@ var fullscreenWrapper = document.getElementById("fullscreen-wrapper");
 
 fullscreenButton.addEventListener("click", function () {
   if (!document.fullscreenElement) {
-    fullscreenWrapper.requestFullscreen().then(function () {
-      fullscreenWrapper.classList.add("fullscreen-mode");
-    });
+    fullscreenWrapper.requestFullscreen().catch(function () {});
   } else {
-    document.exitFullscreen().then(function () {
-      fullscreenWrapper.classList.remove("fullscreen-mode");
-    });
+    document.exitFullscreen().catch(function () {});
   }
+});
+
+document.addEventListener("fullscreenchange", function () {
+  fullscreenWrapper.classList.toggle("fullscreen-mode", !!document.fullscreenElement);
 });
