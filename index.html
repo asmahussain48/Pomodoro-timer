@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A beautiful, distraction-free Pomodoro timer with focus/break modes, ambient sounds, and fullscreen mode." />
+  <meta name="theme-color" content="#0f0c29" />
+  <link rel="icon" type="image/jpeg" href="images/iconImage.jpg">
+  <title>Pomodoro Timer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-decor" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <div class="main-layout" id="fullscreen-wrapper">
+    <aside class="sound-panel">
+      <h3><span class="icon-badge">🎵</span> Ambient Sound</h3>
+      <div class="sound-option">
+        <span>🎬 Original video sound</span>
+        <input type="range" data-sound="original" aria-label="Original video sound volume" />
+      </div>
+      <div class="sound-option">
+        <span>🎧 LoFi beats</span>
+        <input type="range" data-sound="lofi" aria-label="LoFi beats volume" />
+      </div>
+      <div class="sound-option">
+        <span>🌿 Nature sounds</span>
+        <input type="range" data-sound="nature" aria-label="Nature sounds volume" />
+      </div>
+      <div class="sound-option">
+        <span>💧 Rain sounds</span>
+        <input type="range" data-sound="rain" aria-label="Rain sounds volume" />
+      </div>
+      <div class="sound-option">
+        <span>🔥 Fireplace sounds</span>
+        <input type="range" data-sound="fireplace" aria-label="Fireplace sounds volume" />
+      </div>
+      <div class="sound-option">
+        <span>📚 Library ambience</span>
+        <input type="range" data-sound="library" aria-label="Library ambience volume" />
+      </div>
+    </aside>
+
+    <main class="container">
+      <p class="eyebrow">Stay focused, one session at a time</p>
+      <h1 class="title">Pomodoro Timer</h1>
+
+      <div class="mode-tabs" role="tablist" aria-label="Timer mode">
+        <button class="mode-tab active" data-mode="focus" data-duration="1500" role="tab" aria-selected="true">Focus</button>
+        <button class="mode-tab" data-mode="short" data-duration="300" role="tab" aria-selected="false">Short Break</button>
+        <button class="mode-tab" data-mode="long" data-duration="900" role="tab" aria-selected="false">Long Break</button>
+      </div>
+
+      <div class="ring-wrapper">
+        <svg class="progress-ring" width="280" height="280" viewBox="0 0 280 280">
+          <circle class="ring-track" cx="140" cy="140" r="126"></circle>
+          <circle class="ring-progress" id="ring-progress" cx="140" cy="140" r="126"></circle>
+        </svg>
+        <div class="ring-center">
+          <p class="timer" id="timer">25:00</p>
+          <p class="timer-state" id="timer-state">Ready when you are</p>
+        </div>
+      </div>
+
+      <div class="session-dots" id="session-dots" aria-label="Completed focus sessions"></div>
+
+      <div class="button-wrapper">
+        <button id="start" class="btn btn-start"><span>▶</span> Start</button>
+        <button id="stop" class="btn btn-stop"><span>⏸</span> Pause</button>
+        <button id="reset" class="btn btn-reset"><span>↺</span> Reset</button>
+      </div>
+
+      <button id="fullscreen" class="fullscreen-btn" title="Toggle fullscreen" aria-label="Toggle fullscreen">
+        <svg xmlns="http://www.w3.org/2000/svg" class="fullscreen-icon" viewBox="0 0 24 24" width="20" height="20">
+          <path fill="currentColor" d="M7 14H5v5h5v-2H7v-3zm0-4h2V7h3V5H7v5zm10 0h-2V7h-3V5h5v5zm-2 6h3v-3h2v5h-5v-2z"/>
+        </svg>
+      </button>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="index.js"></script>
+</body>
+</html>
